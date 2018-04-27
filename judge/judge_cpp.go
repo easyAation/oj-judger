@@ -19,23 +19,19 @@ func (this *JudgeCpp) Compile(workDir string, codeFile string) Result {
 	_, _, err := sd.Run()
 	if err != nil {
 		return Result{
-			ResultCode:    CompilationError,
-			ResultDes:     err.Error(),
-			RunningTime:   -1,
-			RunningMemory: -1,
+			ResultCode: CompilationError,
+			ResultDes:  err.Error(),
 		}
 	}
 
 	// 编译成功
 	return Result{
-		ResultCode:    Normal,
-		ResultDes:     "",
-		RunningTime:   -1,
-		RunningMemory: -1,
+		ResultCode: Normal,
+		ResultDes:  "",
 	}
 }
 
-func (this *JudgeCpp) Run(inputFile string, outputFile string) Result {
+func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string) Result {
 	fmt.Println(inputFile, outputFile)
 	input, err := os.OpenFile(inputFile, os.O_RDWR, 0777)
 	if err != nil {
@@ -54,7 +50,7 @@ func (this *JudgeCpp) Run(inputFile string, outputFile string) Result {
 	}
 	defer output.Close()
 
-	sd := sandbox.NewSandbox("./user.bin",
+	sd := sandbox.NewSandbox(bin,
 		[]string{},
 		bufio.NewReader(input), bufio.NewWriter(output), 5000, 100000)
 	timeUse, memoryUse, err := sd.Run()

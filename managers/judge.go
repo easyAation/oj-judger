@@ -93,7 +93,9 @@ func JudgeDefault(submitId int64) error {
 
 	caseList := getCaseList(workDir + "/case")
 	for _, name := range caseList {
-		result = j.Run(workDir+"/case/"+name+".in", workDir+"/"+name+".user")
+		result = j.Run(workDir+"/user.bin",
+			workDir+"/case/"+name+".in",
+			workDir+"/"+name+".user")
 		if result.ResultCode != judge.Normal {
 			fmt.Printf("Running Error :%#v\n", result)
 			//this.notify(result)

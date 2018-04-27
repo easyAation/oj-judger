@@ -2,7 +2,7 @@ package judge
 
 type Judge interface {
 	Compile(workDir string, codeFile string) Result
-	Run(inputFile string, outputFile string) Result
+	Run(bin string, inputFile string, outputFile string) Result
 }
 
 func NewJudge(language string) Judge {

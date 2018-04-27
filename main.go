@@ -28,9 +28,3 @@ func main() {
 
 	common.Close()
 }
-
-//func main() {
-//	judgeCpp := new(judge.JudgeCpp)
-//	judgeCpp.Compile("./scripts/test/cpp_hello.cpp")
-//	judgeCpp.Run("./scripts/test/2.in", "user.out")
-//}
