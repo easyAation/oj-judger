@@ -71,6 +71,7 @@ func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse 
 	for range ticker.C {
 		ok, vm, rss, runningTime, cpuTime := GetResourceUsage(cmd.Process.Pid)
 		if !ok {
+			fmt.Println("cmd 退出")
 			break
 		}
 		fmt.Println(vm, rss, runningTime, cpuTime)
