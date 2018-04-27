@@ -81,6 +81,7 @@ func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse 
 		if cpuTime > s.TimeLimit ||
 			runningTime*2 > 3*s.TimeLimit {
 			err = OutOfTimeError
+			fmt.Println("cpu limit")
 			break
 
 		}
@@ -88,6 +89,7 @@ func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse 
 		if rss*3 > s.MemoryLimit*2 ||
 			vm > s.MemoryLimit*10 {
 			err = OutOfMemoryError
+			fmt.Println("rss limit")
 			break
 		}
 	}

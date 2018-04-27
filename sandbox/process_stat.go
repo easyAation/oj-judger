@@ -101,9 +101,10 @@ func VirtualMemory(pid int) int64 {
 	if err != nil {
 		panic(err)
 	}
-	return vmSize
+	return vmSize / 1024
 }
 
+// TODO KB
 // RssSize returns process resident memory, but doesn't include swapped out memory
 func RssSize(pid int) int64 {
 	stat, err := os.Open("/proc/" + strconv.Itoa(pid) + "/stat")
@@ -117,7 +118,7 @@ func RssSize(pid int) int64 {
 	if err != nil {
 		panic(err)
 	}
-	return rssSize * PAGESIZE
+	return rssSize * PAGESIZE / 1024
 
 }
 
