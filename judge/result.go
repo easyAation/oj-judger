@@ -1,9 +1,9 @@
-package managers
+/**
+ * Created by shiyi on 2017/12/21.
+ * Email: shiyi@fightcoder.com
+ */
 
-import (
-	"path/filepath"
-	"os"
-)
+package judge
 
 const (
 	Normal              int = 0  //默认
@@ -25,57 +25,4 @@ type Result struct {
 	ResultDes     string
 	RunningTime   int64 //耗时(ms)
 	RunningMemory int64 //所占空间
-}
-
-func JudgeTest(submitId int64) {
-	// 获取提交信息：代码，语言，用户输入
-	// 编译
-	// 运行
-	// 写入结果
-}
-
-func JudgeSpecial(submitId int64) {
-	// 获取提交信息
-	// 编译
-	// 运行
-	// 执行标准输入运行，得到标准输出
-	// 获取题目信息
-	// 编译特判断
-	// 将标准输出作为特判程序输入
-	// 拿到判断结果
-	// 写入结果
-}
-
-func JudgeDefault(submitId int64) {
-
-}
-
-// 抽象方法如下
-// 编译
-// 运行，输入，输出
-// 读取文件内容
-// diff
-
-func compile() {
-
-}
-
-func run(inputPath string, outputPath string) {
-
-}
-
-func diff(filePathA string, filePathB string) {
-
-}
-
-func readFile(file string) string {
-
-}
-
-func getCurrentPath() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		panic("getCurrentPath: " + err.Error())
-	}
-	return dir
 }

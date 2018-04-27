@@ -34,10 +34,35 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/containerd/cgroups",
+			"repository": "https://github.com/containerd/cgroups",
+			"vcs": "git",
+			"revision": "07683a668a6c20f509112ea932da7e4ca98c7c3f",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/coreos/go-systemd/dbus",
+			"repository": "https://github.com/coreos/go-systemd",
+			"vcs": "git",
+			"revision": "d1b7d058aa2adfc795ad17ff4aaa2bc64ec11c78",
+			"branch": "master",
+			"path": "/dbus",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/dgrijalva/jwt-go",
 			"repository": "https://github.com/dgrijalva/jwt-go",
 			"vcs": "git",
 			"revision": "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/docker/go-units",
+			"repository": "https://github.com/docker/go-units",
+			"vcs": "git",
+			"revision": "47565b4f722fb6ceae66b95f853feed578a4a51c",
 			"branch": "master",
 			"notests": true
 		},
@@ -95,6 +120,59 @@
 			"vcs": "git",
 			"revision": "fc1b13e0d8e240788213230aa5747eb557f80f41",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/godbus/dbus",
+			"repository": "https://github.com/godbus/dbus",
+			"vcs": "git",
+			"revision": "d41f4c66e71d091df57cfee7bf5978c0d612a174",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/gogoproto",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "1ef32a8b9fc3f8ec940126907cedb5998f6318e4",
+			"branch": "master",
+			"path": "/gogoproto",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/proto",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "1ef32a8b9fc3f8ec940126907cedb5998f6318e4",
+			"branch": "master",
+			"path": "proto",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "1ef32a8b9fc3f8ec940126907cedb5998f6318e4",
+			"branch": "master",
+			"path": "protoc-gen-gogo/descriptor",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/sortkeys",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "1ef32a8b9fc3f8ec940126907cedb5998f6318e4",
+			"branch": "master",
+			"path": "sortkeys",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gogo/protobuf/types",
+			"repository": "https://github.com/gogo/protobuf",
+			"vcs": "git",
+			"revision": "1ef32a8b9fc3f8ec940126907cedb5998f6318e4",
+			"branch": "master",
+			"path": "types",
 			"notests": true
 		},
 		{
@@ -161,6 +239,15 @@
 			"vcs": "git",
 			"revision": "1024cb20b4711d09e33e5d3fd132ef88f998f809",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/opencontainers/runtime-spec/specs-go",
+			"repository": "https://github.com/opencontainers/runtime-spec",
+			"vcs": "git",
+			"revision": "a1998ecf27964b493231626886dea534e2cfadc2",
+			"branch": "master",
+			"path": "/specs-go",
 			"notests": true
 		},
 		{
