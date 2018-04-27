@@ -81,6 +81,8 @@ func GetResourceUsage(pid int) (ok bool, vm int64, rss int64,
 	}
 	rt = int64(upTime*1000) - int64(startTime*1000)/sc_clk_tck
 	ok = true
+	rss /= 1024
+	vm /= 1024
 	return
 
 }
