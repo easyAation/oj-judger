@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/pkg/errors"
 	"github.com/open-fightcoder/oj-judger/common/components"
 	"github.com/open-fightcoder/oj-judger/models"
+	"github.com/pkg/errors"
 )
 
 func AccountLogin(email string, password string) (string, error) {

@@ -1,10 +1,10 @@
 package sandbox
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"os/exec"
 	"syscall"
 	"time"
@@ -16,32 +16,39 @@ var (
 )
 
 type Sandbox struct {
-	Bin         string    // binary path
-	Args        []string  // arguments
-	Input       io.Reader // standard input
-	TimeLimit   int64     // time limit in ms
-	MemoryLimit int64     // memory limit in kb
+	Bin         string
+	Args        []string
+	Input       *bufio.Reader
+	Output      *bufio.Writer
+	TimeLimit   int64
+	MemoryLimit int64
 }
 
-func NewSandbox(bin string, args []string, input io.Reader, timeLimit int64, memoryLimit int64) *Sandbox {
+func NewSandbox(bin string, args []string, input *bufio.Reader, output *bufio.Writer, timeLimit int64, memoryLimit int64) *Sandbox {
 	sandbox := new(Sandbox)
 	sandbox.Bin = bin
 	sandbox.Args = args
 	sandbox.Input = input
+	sandbox.Output = output
 	sandbox.TimeLimit = timeLimit
 	sandbox.MemoryLimit = memoryLimit
 	return sandbox
 }
 
-func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse int64, err error) {
+func (s *Sandbox) Run() (timeUse int64, memoryUse int64, err error) {
 	cmd := exec.Command(s.Bin, s.Args...)
 
-	errBuf := new(bytes.Buffer)
-	outBuf := new(bytes.Buffer)
-	cmd.Stderr = errBuf
-	cmd.Stdout = outBuf
-	cmd.Stdin = s.Input
-
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return
+	}
+	if s.Output != nil {
+		cmd.Stdout = s.Output
+		defer s.Output.Flush()
+	}
+	if s.Input != nil {
+		cmd.Stdin = s.Input
+	}
 	if err = cmd.Start(); err != nil {
 		return
 	}
@@ -66,7 +73,6 @@ func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse 
 		errCh <- nil
 	}()
 
-	fmt.Println(cmd.Process.Pid)
 	ticker := time.NewTicker(time.Millisecond)
 	for range ticker.C {
 		ok, vm, rss, runningTime, cpuTime := GetResourceUsage(cmd.Process.Pid)
@@ -95,9 +101,16 @@ func (s *Sandbox) Run() (output []byte, errput []byte, timeUse int64, memoryUse 
 	}
 
 	err = <-errCh
-	fmt.Println("err = ", err)
+	if err != nil {
+		return
+	}
 
-	output = outBuf.Bytes()
-	errput = errBuf.Bytes()
+	errput, err := ioutil.ReadAll(stderr)
+	if err != nil {
+		panic(err)
+	}
+	if string(errput) != "" {
+		err = errors.New(string(errput))
+	}
 	return
 }

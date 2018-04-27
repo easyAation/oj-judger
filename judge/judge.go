@@ -1,11 +1,11 @@
 package judge
 
 type Judge interface {
-	Compile(codeFile string) Result
+	Compile(workDir string, codeFile string) Result
 	Run(inputFile string, outputFile string) Result
 }
 
-func newJudge(language string) Judge {
+func NewJudge(language string) Judge {
 	switch language {
 	case "c++":
 		return &JudgeCpp{}

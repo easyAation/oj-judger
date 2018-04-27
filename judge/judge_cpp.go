@@ -1,9 +1,8 @@
 package judge
 
 import (
-	"fmt"
-
 	"bufio"
+	"fmt"
 	"os"
 
 	"github.com/open-fightcoder/oj-judger/sandbox"
@@ -12,30 +11,83 @@ import (
 type JudgeCpp struct {
 }
 
-func (this *JudgeCpp) Compile(codeFile string) Result {
+func (this *JudgeCpp) Compile(workDir string, codeFile string) Result {
 	sd := sandbox.NewSandbox("g++",
-		[]string{codeFile, "-fmax-errors=200", "-o", "user.bin"},
-		nil, 5000, 100000)
-	output, errput, _, _, err := sd.Run()
+		[]string{workDir + "/" + codeFile, "-fmax-errors=200", "-w", "-o", workDir + "/user.bin"},
+		nil, nil,
+		5000, 100000)
+	_, _, err := sd.Run()
 	if err != nil {
-		panic(err)
+		return Result{
+			ResultCode:    CompilationError,
+			ResultDes:     err.Error(),
+			RunningTime:   -1,
+			RunningMemory: -1,
+		}
 	}
-	fmt.Println(string(output))
-	fmt.Println(string(errput))
-	return Result{}
+
+	// 编译成功
+	return Result{
+		ResultCode:    Normal,
+		ResultDes:     "",
+		RunningTime:   -1,
+		RunningMemory: -1,
+	}
 }
 
 func (this *JudgeCpp) Run(inputFile string, outputFile string) Result {
-	input, err := os.Open(inputFile)
+	fmt.Println(inputFile, outputFile)
+	input, err := os.OpenFile(inputFile, os.O_RDWR, 0777)
+	if err != nil {
+		return Result{
+			ResultCode: SystemError,
+			ResultDes:  err.Error(),
+		}
+	}
+	defer input.Close()
+	output, err := os.OpenFile(outputFile, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0777)
+	if err != nil {
+		return Result{
+			ResultCode: SystemError,
+			ResultDes:  err.Error(),
+		}
+	}
+	defer output.Close()
+
 	sd := sandbox.NewSandbox("./user.bin",
 		[]string{},
-		bufio.NewReader(input), 5000, 100000)
-	output, errput, timeUse, memoryUse, err := sd.Run()
+		bufio.NewReader(input), bufio.NewWriter(output), 5000, 100000)
+	timeUse, memoryUse, err := sd.Run()
 	if err != nil {
-		panic(err)
+		if err == sandbox.OutOfMemoryError {
+			return Result{
+				ResultCode:    MemoryLimitExceeded,
+				RunningTime:   timeUse,
+				RunningMemory: memoryUse,
+				ResultDes:     err.Error(),
+			}
+		}
+		if err == sandbox.OutOfTimeError {
+			return Result{
+				ResultCode:    TimeLimitExceeded,
+				RunningTime:   timeUse,
+				RunningMemory: memoryUse,
+				ResultDes:     err.Error(),
+			}
+		}
+		return Result{
+			ResultCode:    RuntimeError,
+			RunningMemory: memoryUse,
+			RunningTime:   timeUse,
+			ResultDes:     err.Error(),
+		}
 	}
-	fmt.Printf("output [%s]\n", string(output))
-	fmt.Printf("errput [%s]\n", string(errput))
+
 	fmt.Println(timeUse, memoryUse)
-	return Result{}
+	return Result{
+		ResultCode:    Normal,
+		RunningTime:   timeUse,
+		RunningMemory: memoryUse,
+		ResultDes:     "",
+	}
 }

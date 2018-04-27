@@ -1,26 +1,36 @@
 package main
 
-import "github.com/open-fightcoder/oj-judger/judge"
+import (
+	"flag"
+	"fmt"
+	"net/http"
 
-//func main() {
-//	cfgFile := flag.String("c", "cfg/cfg.toml.debug", "set config file")
-//	flag.Parse()
-//
-//	common.Init(*cfgFile)
-//	defer common.Close()
-//
-//	router := router.GetRouter()
-//
-//	graceful.LogListenAndServe(&http.Server{
-//		Addr:    fmt.Sprintf(":%d", g.Conf().Run.HTTPPort),
-//		Handler: router,
-//	})
-//
-//	common.Close()
-//}
+	"github.com/TV4/graceful"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/open-fightcoder/oj-judger/common"
+	"github.com/open-fightcoder/oj-judger/common/g"
+	"github.com/open-fightcoder/oj-judger/router"
+)
 
 func main() {
-	judgeCpp := new(judge.JudgeCpp)
-	judgeCpp.Compile("./scripts/test/cpp_hello.cpp")
-	judgeCpp.Run("./scripts/test/2.in", "user.out")
+	cfgFile := flag.String("c", "cfg/cfg.toml.debug", "set config file")
+	flag.Parse()
+
+	common.Init(*cfgFile)
+	defer common.Close()
+
+	router := router.GetRouter()
+
+	graceful.LogListenAndServe(&http.Server{
+		Addr:    fmt.Sprintf(":%d", g.Conf().Run.HTTPPort),
+		Handler: router,
+	})
+
+	common.Close()
 }
+
+//func main() {
+//	judgeCpp := new(judge.JudgeCpp)
+//	judgeCpp.Compile("./scripts/test/cpp_hello.cpp")
+//	judgeCpp.Run("./scripts/test/2.in", "user.out")
+//}
