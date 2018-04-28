@@ -35,7 +35,7 @@ func NewSandbox(bin string, args []string, input *bufio.Reader, output *bufio.Wr
 	return sandbox
 }
 
-func (s *Sandbox) Run() (timeUse int64, memoryUse int64, err error) {
+func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 	cmd := exec.Command(s.Bin, s.Args...)
 
 	stderr, err := cmd.StderrPipe()
@@ -81,8 +81,8 @@ func (s *Sandbox) Run() (timeUse int64, memoryUse int64, err error) {
 			break
 		}
 		fmt.Println(vm, rss, runningTime, cpuTime)
-		timeUse = cpuTime
-		memoryUse = rss * 3 / 2
+		timeUse = int(cpuTime)
+		memoryUse = int(rss * 3 / 2)
 
 		if cpuTime > s.TimeLimit ||
 			runningTime*2 > 3*s.TimeLimit {

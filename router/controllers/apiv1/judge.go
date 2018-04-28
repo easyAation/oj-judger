@@ -24,12 +24,8 @@ func httpHandlerJudgeTest(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
-	err = managers.JudgeTest(job.SubmitId)
-	if err != nil {
-		c.JSON(http.StatusOK, base.Fail(err.Error()))
-	}
-	c.JSON(http.StatusOK, base.Success("ok"))
+	result := managers.JudgeTest(job.SubmitId)
+	c.JSON(http.StatusOK, base.Success(result))
 }
 
 func httpHandlerJudgeSpecial(c *gin.Context) {
@@ -38,12 +34,8 @@ func httpHandlerJudgeSpecial(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
-	err = managers.JudgeSpecial(job.SubmitId)
-	if err != nil {
-		c.JSON(http.StatusOK, base.Fail(err.Error()))
-	}
-	c.JSON(http.StatusOK, base.Success("ok"))
+	result := managers.JudgeSpecial(job.SubmitId)
+	c.JSON(http.StatusOK, base.Success(result))
 }
 
 func httpHandlerJudgeDefault(c *gin.Context) {
@@ -52,10 +44,6 @@ func httpHandlerJudgeDefault(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	err = managers.JudgeDefault(job.SubmitId)
-	if err != nil {
-		c.JSON(http.StatusOK, base.Fail(err.Error()))
-		return
-	}
-	c.JSON(http.StatusOK, base.Success("ok"))
+	result := managers.JudgeDefault(job.SubmitId)
+	c.JSON(http.StatusOK, base.Success(result))
 }

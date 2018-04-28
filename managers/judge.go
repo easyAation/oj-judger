@@ -2,12 +2,12 @@ package managers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
-	"os/exec"
-
-	"io/ioutil"
+	"time"
 
 	"github.com/mholt/archiver"
 	"github.com/minio/minio-go"
@@ -17,15 +17,15 @@ import (
 	"github.com/open-fightcoder/oj-judger/models"
 )
 
-func JudgeTest(submitId int64) error {
+func JudgeTest(submitId int64) judge.Result {
 	// 获取提交信息：代码，语言，用户输入
 	// 编译
 	// 运行
 	// 写入结果
-	return nil
+	return judge.Result{}
 }
 
-func JudgeSpecial(submitId int64) error {
+func JudgeSpecial(submitId int64) judge.Result {
 	// 获取提交信息
 	// 编译
 	// 运行
@@ -36,53 +36,85 @@ func JudgeSpecial(submitId int64) error {
 	// 拿到判断结果
 	// 写入结果
 
-	return nil
+	return judge.Result{}
 }
 
-func JudgeDefault(submitId int64) error {
+func JudgeDefault(submitId int64) judge.Result {
+	fmt.Println("sleep before")
+	time.Sleep(10 * time.Second)
+	fmt.Println("sleep after")
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
-		return fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
+		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
 	if submit == nil {
-		return fmt.Errorf("get submit %d failure: col not found", submitId)
+		err = fmt.Errorf("get submit %d failure: col not found", submitId)
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
-
 	workDir, err := createworkDir("default", submitId, submit.UserId)
 	if err != nil {
-		return fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
+		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
-
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
-		return fmt.Errorf("get problem failure: %s", err.Error())
+		err = fmt.Errorf("get problem failure: %s", err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
 	if problem == nil {
-		return fmt.Errorf("get problem %d failure: col not found", submit.ProblemId)
+		err = fmt.Errorf("get problem %d failure: col not found", submit.ProblemId)
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
 
 	err = getCode(submit.Code, workDir)
 	if err != nil {
-		return fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
+		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
 
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
-		return fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
+		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
 	}
 
-	// TODO 编译中
-	fmt.Println("编译中")
+	// 编译中
+	callResult(judge.Result{
+		ResultCode: judge.Compiling,
+	})
 
 	j := judge.NewJudge(submit.Language)
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
-		fmt.Printf("Compile Error :%#v\n", result)
-		return nil
+		// 编译失败
+		callResult(result)
+		return result
 	}
 
-	// TODO 编译失败 || 运行中
-	fmt.Printf("%#v\n", result)
+	// 运行中
+	callResult(result)
 
 	totalResult := judge.Result{
 		ResultCode:    judge.Accepted,
@@ -98,7 +130,6 @@ func JudgeDefault(submitId int64) error {
 			workDir+"/"+name+".user")
 		if result.ResultCode != judge.Normal {
 			fmt.Printf("Running Error :%#v\n", result)
-			//this.notify(result)
 			totalResult = result
 			break
 		}
@@ -119,10 +150,21 @@ func JudgeDefault(submitId int64) error {
 		}
 	}
 
-	// TODO 结果
-	fmt.Println(totalResult)
+	callResult(totalResult)
 
-	return nil
+	return totalResult
+}
+
+func callResult(result judge.Result) {
+	//submit := &models.Submit {
+	//	Result:result.ResultCode,
+	//	ResultDes:result.ResultDes,
+	//	RunningTime:result.RunningTime,
+	//	RunningMemory:result.RunningMemory,
+	//}
+
+	//return models.SubmitUpdate(submit)
+	fmt.Printf("%#v\n", result)
 }
 
 func getCode(code string, workDir string) error {
@@ -141,12 +183,6 @@ func getCase(cs string, workDir string) error {
 	err = archiver.Zip.Open(workDir+"/case.zip", workDir+"/case")
 	return err
 }
-
-// 抽象方法如下
-// 编译
-// 运行，输入，输出
-// 读取文件内容
-// diff
 
 func getCaseList(path string) []string {
 	dir_list, err := ioutil.ReadDir(path)

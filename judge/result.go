@@ -21,8 +21,8 @@ const (
 )
 
 type Result struct {
-	ResultCode    int
-	ResultDes     string
-	RunningTime   int64 //耗时(ms)
-	RunningMemory int64 //所占空间
+	ResultCode    int    `json:"result_code"`
+	ResultDes     string `json:"result_des"`
+	RunningTime   int    `json:"running_time"`   //耗时(ms)
+	RunningMemory int    `json:"running_memory"` //所占空间
 }

@@ -2,6 +2,7 @@ FROM java:alpine
 MAINTAINER ShiYi <shiyi@fightcoder.com>
 
 RUN apk upgrade --update;
+RUN apk add bash;
 RUN apk add git;
 RUN apk add curl;
 RUN curl https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz | tar xzf - -C /; \
@@ -18,11 +19,11 @@ ENV PATH=$PATH:$GOROOT/bin
 RUN mkdir -p /go/src; \
     cd /go/src; \
     git clone https://github.com/open-fightcoder/oj-judger.git; \
-    cd oj-judger;
-#    /bin/bash build.sh; \
-#    cd output; \
-#    /bin/bash control.sh start;
+    cd oj-judger; \
+    ./build.sh; \
+    cd output; \
+    ./control.sh start;
 
-WORKDIR /go/src/oj-judger
+WORKDIR /go/src/oj-judger/output
 
 CMD while true; do sleep 1; done
