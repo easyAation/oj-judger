@@ -18,11 +18,11 @@ ENV PATH=$PATH:$GOROOT/bin
 RUN mkdir -p /go/src; \
     cd /go/src; \
     git clone https://github.com/open-fightcoder/oj-judger.git; \
-    cd oj-judger; \
-    /bin/bash build.sh; \
-    cd output; \
-    /bin/bash control.sh start;
+    cd oj-judger;
+#    /bin/bash build.sh; \
+#    cd output; \
+#    /bin/bash control.sh start;
 
-WORKDIR /go/src/oj-judger/output
+WORKDIR /go/src/oj-judger
 
 CMD while true; do sleep 1; done
