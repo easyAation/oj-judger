@@ -19,9 +19,9 @@ RUN mkdir -p /go/src; \
     cd /go/src; \
     git clone https://github.com/open-fightcoder/oj-judger.git; \
     cd oj-judger; \
-    ./build.sh; \
+    /bin/bash build.sh; \
     cd output; \
-    ./control.sh start;
+    /bin/bash control.sh start;
 
 WORKDIR /go/src/oj-judger/output
 
