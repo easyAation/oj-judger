@@ -1,8 +1,8 @@
 FROM java:alpine
-MAINTAINER ShiYi <shiyi@fightcoder.com>
+MAINTAINER ShiYi <me@shiyicode.com>
 
 RUN apk upgrade --update;
-RUN apk add linux-headers
+RUN apk add linux-headers;
 RUN apk add bash;
 RUN apk add git;
 RUN apk add curl;
@@ -10,7 +10,7 @@ RUN apk add python;
 RUN apk add g++;
 RUN apk add gcc;
 RUN apk add go;
-RUN apk add libc-dev
+RUN apk add libc-dev;
 RUN curl https://storage.googleapis.com/golang/go1.9.linux-amd64.tar.gz | tar xzf - -C /; \
     mv /go /goroot;
 
