@@ -14,7 +14,7 @@ function start() {
 	# check old
 	check_pid
 	local running=$?
-	if [[ $running -gt 0 ]]; then
+	if [[ $running != 0 ]]; then
 		echo "started, pid=$(get_pid)"
 		exit 0
 	fi
@@ -26,12 +26,12 @@ function start() {
 	local lpid=$!
 	sleep 1
 
-	check_pid_number $lpid
-	local lnum=$?
-	if [ "x$lnum" == "x0" ]; then
-		echo "start failed, pid=$lpid"
-		exit 1
-	fi
+#	check_pid_number $lpid
+#	local lnum=$?
+#	if [ "x$lnum" == "x0" ]; then
+#		echo "start failed, pid=$lpid"
+#		exit 1
+#	fi
 
 	echo $lpid > $pidfile
 	echo "start ok, pid=$lpid"
