@@ -30,4 +30,4 @@ RUN mkdir -p /go/src; \
 
 WORKDIR /go/src/oj-judger/output
 
-CMD ./control.sh start
+CMD ./oj-judger
