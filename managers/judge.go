@@ -7,8 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"time"
-
 	"github.com/mholt/archiver"
 	"github.com/minio/minio-go"
 	"github.com/open-fightcoder/oj-judger/common/g"
@@ -40,9 +38,10 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	fmt.Println("sleep before")
-	time.Sleep(10 * time.Second)
-	fmt.Println("sleep after")
+	//fmt.Println("sleep before")
+	//time.Sleep(10 * time.Second)
+	//fmt.Println("sleep after")
+	fmt.Println("start")
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
@@ -58,7 +57,9 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	workDir, err := createworkDir("default", submitId, submit.UserId)
+
+	fmt.Println("workdir")
+	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
 		return judge.Result{
@@ -82,6 +83,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
+	fmt.Println("getcode")
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
@@ -90,7 +92,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-
+	fmt.Println("getcase")
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
@@ -217,7 +219,7 @@ func compare(userOutput string, caseOutput string) string {
 	return ""
 }
 
-func createworkDir(judgeType string, submitId int64, userId int64) (string, error) {
+func createWorkDir(judgeType string, submitId int64, userId int64) (string, error) {
 	dir := fmt.Sprintf("%s/work/%s/%d_%d", getCurrentPath(), judgeType, submitId, userId)
 	err := os.MkdirAll(dir, 0777)
 	return dir, err
