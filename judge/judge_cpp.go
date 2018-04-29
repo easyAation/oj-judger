@@ -13,7 +13,7 @@ type JudgeCpp struct {
 
 func (this *JudgeCpp) Compile(workDir string, codeFile string) Result {
 	sd := sandbox.NewSandbox("g++",
-		[]string{workDir + "/" + codeFile, "-fmax-errors=200", "-w", "-o", workDir + "/user.bin"},
+		[]string{workDir + "/" + codeFile, "-fmax-errors=200", "-O2", "-static", "-w", "-o", workDir + "/user.bin"},
 		nil, nil,
 		5000, 100000)
 	_, _, err := sd.Run()
