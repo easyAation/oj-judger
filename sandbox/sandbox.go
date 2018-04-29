@@ -42,6 +42,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
+		fmt.Println("A")
 		return
 	}
 	if s.Output != nil {
@@ -52,6 +53,8 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		cmd.Stdin = s.Input
 	}
 	if err = cmd.Start(); err != nil {
+		log.Println(err)
+		fmt.Println("B")
 		return
 	}
 	defer cmd.Process.Kill()
@@ -62,7 +65,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		var rusage syscall.Rusage
 		var wStatus syscall.WaitStatus
 
-		_, err = syscall.Wait4(cmd.Process.Pid, &wStatus, syscall.WUNTRACED, &rusage)
+		_, err := syscall.Wait4(cmd.Process.Pid, &wStatus, syscall.WUNTRACED, &rusage)
 		if err != nil {
 			log.Println("wait error", err)
 			errCh <- err
@@ -89,23 +92,29 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		if cpuTime > s.TimeLimit ||
 			runningTime*2 > 3*s.TimeLimit {
 			err = OutOfTimeError
-			fmt.Println("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
-			break
+			log.Println("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
+			return
 		}
 
 		if rss*3 > s.MemoryLimit*2 ||
 			vm > s.MemoryLimit*10 {
 			err = OutOfMemoryError
-			fmt.Println("rss limit: ", vm, rss, s.MemoryLimit)
-			break
+			log.Println("rss limit: ", vm, rss, s.MemoryLimit)
+			return
 		}
 	}
 
 	if err != nil {
+		log.Println("A", err.Error())
+	}
+
+	err = <-errCh
+	if err != nil {
 		return
 	}
 
-	errput, err := ioutil.ReadAll(stderr)
+	var errput []byte
+	errput, err = ioutil.ReadAll(stderr)
 	if err != nil {
 		return
 	}
@@ -113,9 +122,5 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		err = errors.New(string(errput))
 	}
 
-	err = <-errCh
-	if err != nil {
-		return
-	}
 	return
 }
