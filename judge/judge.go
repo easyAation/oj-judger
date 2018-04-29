@@ -7,6 +7,8 @@ type Judge interface {
 
 func NewJudge(language string) Judge {
 	switch language {
+	case "c":
+		return &JudgeCpp{}
 	case "c++":
 		return &JudgeCpp{}
 	default:
