@@ -111,7 +111,9 @@ func JudgeDefault(submitId int64) judge.Result {
 	}
 
 	// 运行中
-	callResult(result)
+	callResult(judge.Result{
+		ResultCode: judge.Running,
+	})
 
 	totalResult := judge.Result{
 		ResultCode:    judge.Accepted,

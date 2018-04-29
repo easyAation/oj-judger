@@ -86,7 +86,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		if cpuTime > s.TimeLimit ||
 			runningTime*2 > 3*s.TimeLimit {
 			err = OutOfTimeError
-			fmt.Println("cpu limit")
+			fmt.Println("cpu limit", runningTime, cpuTime)
 			break
 		}
 
@@ -98,12 +98,6 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		}
 	}
 
-	cmd.Process.Kill()
-	if err != nil {
-		return
-	}
-
-	err = <-errCh
 	if err != nil {
 		return
 	}
@@ -114,6 +108,11 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 	}
 	if string(errput) != "" {
 		err = errors.New(string(errput))
+	}
+
+	err = <-errCh
+	if err != nil {
+		return
 	}
 	return
 }
