@@ -21,12 +21,11 @@ ENV GOROOT /goroot
 ENV GOBIN=$GOPATH/bin
 ENV PATH=$PATH:$GOROOT/bin
 
-RUN mkdir -p /go/src; \
-    cd /go/src;
+RUN mkdir -p /go/src;
 
-ADD ./ oj-judger
+ADD ./ /go/src/oj-judger
 
-RUN cd oj-judger; \
+RUN cd /go/src/oj-judger; \
     ./build.sh; \
     cd output;
 
