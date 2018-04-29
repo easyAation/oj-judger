@@ -54,7 +54,10 @@ func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string, timeL
 		[]string{},
 		bufio.NewReader(input), bufio.NewWriter(output), timeLimit, memoryLimit)
 	timeUse, memoryUse, err := sd.Run()
-	fmt.Println(timeUse, memoryUse, err.Error(), "judge runed")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(timeUse, memoryUse)
 	if err != nil {
 		if err == sandbox.OutOfMemoryError {
 			// 超时
