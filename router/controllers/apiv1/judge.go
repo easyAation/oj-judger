@@ -3,6 +3,10 @@ package apiv1
 import (
 	"net/http"
 
+	"time"
+
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/open-fightcoder/oj-judger/managers"
 	"github.com/open-fightcoder/oj-judger/router/controllers/base"
@@ -44,6 +48,9 @@ func httpHandlerJudgeDefault(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("start")
+	time.Sleep(10 * time.Second)
+	fmt.Println("end")
 	result := managers.JudgeDefault(job.SubmitId)
 	c.JSON(http.StatusOK, base.Success(result))
 }
