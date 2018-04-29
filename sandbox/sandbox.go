@@ -80,7 +80,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 			fmt.Println("cmd 退出")
 			break
 		}
-		fmt.Println(vm, rss, runningTime, cpuTime)
+		//fmt.Println(vm, rss, runningTime, cpuTime)
 		timeUse = int(cpuTime)
 		memoryUse = int(rss * 3 / 2)
 
