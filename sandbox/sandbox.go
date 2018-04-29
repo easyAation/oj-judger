@@ -55,7 +55,6 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 	defer cmd.Process.Kill()
 
 	errCh := make(chan error)
-	defer close(errCh)
 
 	go func() {
 		var rusage syscall.Rusage
@@ -89,7 +88,6 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 			err = OutOfTimeError
 			fmt.Println("cpu limit")
 			break
-
 		}
 
 		if rss*3 > s.MemoryLimit*2 ||
@@ -100,6 +98,11 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		}
 	}
 
+	cmd.Process.Kill()
+	if err != nil {
+		return
+	}
+
 	err = <-errCh
 	if err != nil {
 		return
@@ -107,7 +110,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 	errput, err := ioutil.ReadAll(stderr)
 	if err != nil {
-		panic(err)
+		return
 	}
 	if string(errput) != "" {
 		err = errors.New(string(errput))

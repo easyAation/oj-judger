@@ -31,7 +31,7 @@ func (this *JudgeCpp) Compile(workDir string, codeFile string) Result {
 	}
 }
 
-func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string) Result {
+func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string, timeLimit int64, memoryLimit int64) Result {
 	fmt.Println(inputFile, outputFile)
 	input, err := os.OpenFile(inputFile, os.O_RDWR, 0777)
 	if err != nil {
@@ -52,25 +52,29 @@ func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string) Resul
 
 	sd := sandbox.NewSandbox(bin,
 		[]string{},
-		bufio.NewReader(input), bufio.NewWriter(output), 5000, 100000)
+		bufio.NewReader(input), bufio.NewWriter(output), timeLimit, memoryLimit)
 	timeUse, memoryUse, err := sd.Run()
+	fmt.Println(timeUse, memoryUse, err.Error(), "judge runed")
 	if err != nil {
 		if err == sandbox.OutOfMemoryError {
+			// 超时
 			return Result{
 				ResultCode:    MemoryLimitExceeded,
 				RunningTime:   timeUse,
 				RunningMemory: memoryUse,
-				ResultDes:     err.Error(),
+				ResultDes:     "",
 			}
 		}
 		if err == sandbox.OutOfTimeError {
+			// 超内存
 			return Result{
 				ResultCode:    TimeLimitExceeded,
 				RunningTime:   timeUse,
 				RunningMemory: memoryUse,
-				ResultDes:     err.Error(),
+				ResultDes:     "",
 			}
 		}
+		// 运行异常
 		return Result{
 			ResultCode:    RuntimeError,
 			RunningMemory: memoryUse,
@@ -79,7 +83,7 @@ func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string) Resul
 		}
 	}
 
-	fmt.Println(timeUse, memoryUse)
+	// 正常
 	return Result{
 		ResultCode:    Normal,
 		RunningTime:   timeUse,

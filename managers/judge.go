@@ -38,9 +38,6 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	//fmt.Println("sleep before")
-	//time.Sleep(10 * time.Second)
-	//fmt.Println("sleep after")
 	fmt.Println("start")
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
@@ -58,7 +55,6 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
-	fmt.Println("workdir")
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
@@ -83,7 +79,6 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
-	fmt.Println("getcode")
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
@@ -92,7 +87,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	fmt.Println("getcase")
+
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
@@ -129,9 +124,11 @@ func JudgeDefault(submitId int64) judge.Result {
 	for _, name := range caseList {
 		result = j.Run(workDir+"/user.bin",
 			workDir+"/case/"+name+".in",
-			workDir+"/"+name+".user")
+			workDir+"/"+name+".user",
+			int64(problem.TimeLimit),
+			int64(problem.MemoryLimit))
+		fmt.Println("run :", result)
 		if result.ResultCode != judge.Normal {
-			fmt.Printf("Running Error :%#v\n", result)
 			totalResult = result
 			break
 		}
