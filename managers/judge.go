@@ -117,9 +117,6 @@ func JudgeDefault(submitId int64) judge.Result {
 		ResultCode: judge.Running,
 	})
 
-	// TODO
-	return result
-
 	totalResult := judge.Result{
 		ResultCode:    judge.Accepted,
 		ResultDes:     "",
