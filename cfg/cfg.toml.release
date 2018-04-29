@@ -14,10 +14,25 @@ maxAge = 30     # 文件最大保存时间：30天
 [mysql]
 maxIdle = 5      # 最大空闲连接数
 maxOpen = 10     # 最大打开连接数
-debug = false
+debug = false    # 模式
 
-webAddr = "root:123456@tcp(localhost:3306)/fightcoder?charset=utf8&loc=Asia%2FShanghai&parseTime=true&wait_timeout=3600"
+webAddr = "root:123456@tcp(10.0.1.214:9000)/fightcoder?charset=utf8&loc=Asia%2FShanghai&parseTime=true&wait_timeout=3600"
 
 [jwt]
 encodeMethod = "HS256" # [HS256, HS384, HS512]
 maxEffectiveTime = 3  # 最大存活时间:天
+
+[redis]
+address = "127.0.0.1:6379"      # redis address
+password = ""                   # no password set
+database = 0                    # use default DB
+poolSize = 5
+
+[minio]
+endpoint = "10.0.1.211:9000"
+accessKeyID = "FightCoder"
+secretAccessKey = "LetsToChangeTheWorld"
+secure = false
+imgBucket = "image"
+codeBucket = "test-code"
+caseBucket = "test-case"
