@@ -31,4 +31,4 @@ RUN cd /go/src/oj-judger; \
 
 WORKDIR /go/src/oj-judger/output
 
-CMD ./oj-judger
+CMD ./oj-judger -c cfg/cfg.toml.release
