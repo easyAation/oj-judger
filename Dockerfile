@@ -22,9 +22,11 @@ ENV GOBIN=$GOPATH/bin
 ENV PATH=$PATH:$GOROOT/bin
 
 RUN mkdir -p /go/src; \
-    cd /go/src; \
-    git clone https://github.com/open-fightcoder/oj-judger.git; \
-    cd oj-judger; \
+    cd /go/src;
+
+ADD ./ oj-judger
+
+RUN cd oj-judger; \
     ./build.sh; \
     cd output;
 
