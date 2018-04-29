@@ -13,6 +13,7 @@ import (
 	"github.com/open-fightcoder/oj-judger/common/store"
 	"github.com/open-fightcoder/oj-judger/judge"
 	"github.com/open-fightcoder/oj-judger/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func JudgeTest(submitId int64) judge.Result {
@@ -38,7 +39,7 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	fmt.Println("start")
+	log.Println(submitId, "start judge")
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
@@ -54,7 +55,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-
+	log.Println(submitId, "create workdir")
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
@@ -63,6 +64,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
+	log.Println(submitId, "get project")
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
@@ -78,7 +80,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-
+	log.Println(submitId, "get code")
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
@@ -87,7 +89,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-
+	log.Println(submitId, "get case")
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
@@ -101,7 +103,7 @@ func JudgeDefault(submitId int64) judge.Result {
 	callResult(judge.Result{
 		ResultCode: judge.Compiling,
 	})
-
+	log.Println(submitId, "start compile")
 	j := judge.NewJudge(submit.Language)
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
@@ -109,7 +111,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		callResult(result)
 		return result
 	}
-
+	log.Println(submitId, "start run")
 	// 运行中
 	callResult(judge.Result{
 		ResultCode: judge.Running,
@@ -129,7 +131,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			workDir+"/"+name+".user",
 			int64(problem.TimeLimit),
 			int64(problem.MemoryLimit))
-		fmt.Println("run :", result)
+
 		if result.ResultCode != judge.Normal {
 			totalResult = result
 			break
@@ -152,7 +154,6 @@ func JudgeDefault(submitId int64) judge.Result {
 	}
 
 	callResult(totalResult)
-
 	return totalResult
 }
 
@@ -188,7 +189,8 @@ func getCase(cs string, workDir string) error {
 func getCaseList(path string) []string {
 	dir_list, err := ioutil.ReadDir(path)
 	if err != nil {
-		panic(err)
+		log.Error(err)
+		return nil
 	}
 
 	caseList := make([]string, 0)
@@ -211,7 +213,7 @@ func compare(userOutput string, caseOutput string) string {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("diff err:", err)
+		log.Println("diff err:", err)
 		return string(output)
 	}
 
@@ -227,7 +229,7 @@ func createWorkDir(judgeType string, submitId int64, userId int64) (string, erro
 func getCurrentPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		panic("getCurrentPath: " + err.Error())
+		log.Error("getCurrentPath: " + err.Error())
 	}
 	return dir
 }

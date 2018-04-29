@@ -2,7 +2,6 @@ package judge
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 
 	"github.com/open-fightcoder/oj-judger/sandbox"
@@ -32,7 +31,6 @@ func (this *JudgeCpp) Compile(workDir string, codeFile string) Result {
 }
 
 func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string, timeLimit int64, memoryLimit int64) Result {
-	fmt.Println(inputFile, outputFile)
 	input, err := os.OpenFile(inputFile, os.O_RDWR, 0777)
 	if err != nil {
 		return Result{
@@ -54,10 +52,7 @@ func (this *JudgeCpp) Run(bin string, inputFile string, outputFile string, timeL
 		[]string{},
 		bufio.NewReader(input), bufio.NewWriter(output), timeLimit, memoryLimit)
 	timeUse, memoryUse, err := sd.Run()
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println(timeUse, memoryUse)
+
 	if err != nil {
 		if err == sandbox.OutOfMemoryError {
 			// 超时

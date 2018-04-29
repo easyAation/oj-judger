@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -62,11 +64,12 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 		_, err = syscall.Wait4(cmd.Process.Pid, &wStatus, syscall.WUNTRACED, &rusage)
 		if err != nil {
-			fmt.Println("wait error", err)
+			log.Println("wait error", err)
 			errCh <- err
 		}
 		if wStatus.Signaled() {
 			sig := wStatus.Signal()
+			log.Println("get signal", sig)
 			errCh <- fmt.Errorf("get signal %s", sig)
 		}
 		errCh <- nil
@@ -76,7 +79,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 	for range ticker.C {
 		ok, vm, rss, runningTime, cpuTime := GetResourceUsage(cmd.Process.Pid)
 		if !ok {
-			fmt.Println("cmd 退出")
+			log.Println("cmd 退出")
 			break
 		}
 		//fmt.Println(vm, rss, runningTime, cpuTime)
@@ -86,14 +89,14 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		if cpuTime > s.TimeLimit ||
 			runningTime*2 > 3*s.TimeLimit {
 			err = OutOfTimeError
-			fmt.Println("cpu limit", runningTime, cpuTime)
+			fmt.Println("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
 			break
 		}
 
 		if rss*3 > s.MemoryLimit*2 ||
 			vm > s.MemoryLimit*10 {
 			err = OutOfMemoryError
-			fmt.Println("rss limit")
+			fmt.Println("rss limit: ", vm, rss, s.MemoryLimit)
 			break
 		}
 	}
