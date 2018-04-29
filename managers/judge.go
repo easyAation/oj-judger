@@ -158,15 +158,19 @@ func JudgeDefault(submitId int64) judge.Result {
 }
 
 func callResult(result judge.Result) {
-	//submit := &models.Submit {
-	//	Result:result.ResultCode,
-	//	ResultDes:result.ResultDes,
-	//	RunningTime:result.RunningTime,
-	//	RunningMemory:result.RunningMemory,
-	//}
+	submit := &models.Submit{
+		Result:        result.ResultCode,
+		ResultDes:     result.ResultDes,
+		RunningTime:   result.RunningTime,
+		RunningMemory: result.RunningMemory,
+	}
 
-	//return models.SubmitUpdate(submit)
-	fmt.Printf("%#v\n", result)
+	log.Printf("call result: %#v\n", result)
+	err := models.SubmitUpdate(submit)
+	if err != nil {
+		log.Error("call result failure:", err.Error())
+	}
+	return
 }
 
 func getCode(code string, workDir string) error {
