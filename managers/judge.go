@@ -163,7 +163,7 @@ func callResult(submit *models.Submit, result judge.Result) {
 	submit.RunningTime = result.RunningTime
 	submit.RunningMemory = result.RunningMemory
 
-	log.Infof("%d call result %#v", result)
+	log.Infof("%d call result %#v", submit.Id, result)
 	err := models.SubmitUpdate(submit)
 	if err != nil {
 		log.Error("call result failure:", err.Error())
