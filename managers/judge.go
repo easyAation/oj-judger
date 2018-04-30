@@ -124,13 +124,14 @@ func JudgeDefault(submitId int64) judge.Result {
 	}
 
 	caseList := getCaseList(workDir + "/case")
+	log.Infof("%d case list %#v", submitId, caseList)
 	for _, name := range caseList {
 		result = j.Run(workDir+"/user.bin",
 			workDir+"/case/"+name+".in",
 			workDir+"/"+name+".user",
 			int64(problem.TimeLimit),
 			int64(problem.MemoryLimit))
-
+		log.Infof("%d run result %#v", submitId, result)
 		if result.ResultCode != judge.Normal {
 			totalResult = result
 			break
