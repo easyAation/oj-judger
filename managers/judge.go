@@ -39,7 +39,7 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	log.Println(submitId, "start judge")
+	log.Info(submitId, "start judge")
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
@@ -55,7 +55,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Println(submitId, "create workdir")
+	log.Info(submitId, "create workdir")
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
@@ -64,7 +64,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Println(submitId, "get project")
+	log.Info(submitId, "get project")
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
@@ -103,7 +103,7 @@ func JudgeDefault(submitId int64) judge.Result {
 	callResult(submitId, judge.Result{
 		ResultCode: judge.Compiling,
 	})
-	log.Println(submitId, "start compile")
+	log.Info(submitId, "start compile")
 	j := judge.NewJudge(submit.Language)
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
@@ -111,7 +111,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		callResult(submitId, result)
 		return result
 	}
-	log.Println(submitId, "start run")
+	log.Info(submitId, "start run")
 	// 运行中
 	callResult(submitId, judge.Result{
 		ResultCode: judge.Running,
@@ -218,7 +218,7 @@ func compare(userOutput string, caseOutput string) string {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Println("diff err:", err)
+		log.Info("diff err:", err)
 		return string(output)
 	}
 
