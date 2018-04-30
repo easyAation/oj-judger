@@ -33,5 +33,5 @@ accessKeyID = "FightCoder"
 secretAccessKey = "LetsToChangeTheWorld"
 secure = false
 imgBucket = "image"
-codeBucket = "test-code"
-caseBucket = "test-case"
+codeBucket = "code"
+caseBucket = "case"
