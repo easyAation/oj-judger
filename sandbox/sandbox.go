@@ -90,7 +90,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		memoryUse = int(rss * 3 / 2)
 
 		if cpuTime > s.TimeLimit ||
-			runningTime*2 > 3*s.TimeLimit {
+			runningTime > 5*s.TimeLimit {
 			err = OutOfTimeError
 			log.Println("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
 			return
