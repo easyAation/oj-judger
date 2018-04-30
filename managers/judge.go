@@ -100,7 +100,7 @@ func JudgeDefault(submitId int64) judge.Result {
 	}
 
 	// 编译中
-	callResult(judge.Result{
+	callResult(submitId, judge.Result{
 		ResultCode: judge.Compiling,
 	})
 	log.Println(submitId, "start compile")
@@ -108,12 +108,12 @@ func JudgeDefault(submitId int64) judge.Result {
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
 		// 编译失败
-		callResult(result)
+		callResult(submitId, result)
 		return result
 	}
 	log.Println(submitId, "start run")
 	// 运行中
-	callResult(judge.Result{
+	callResult(submitId, judge.Result{
 		ResultCode: judge.Running,
 	})
 
@@ -153,19 +153,20 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
-	callResult(totalResult)
+	callResult(submitId, totalResult)
 	return totalResult
 }
 
-func callResult(result judge.Result) {
+func callResult(submitId int64, result judge.Result) {
 	submit := &models.Submit{
+		Id:            submitId,
 		Result:        result.ResultCode,
 		ResultDes:     result.ResultDes,
 		RunningTime:   result.RunningTime,
 		RunningMemory: result.RunningMemory,
 	}
 
-	log.Printf("call result: %#v\n", result)
+	log.Info("call result: %#v\n", result)
 	err := models.SubmitUpdate(submit)
 	if err != nil {
 		log.Error("call result failure:", err.Error())

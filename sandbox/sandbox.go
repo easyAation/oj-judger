@@ -42,7 +42,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		fmt.Println("A")
+		log.Println("A")
 		return
 	}
 	if s.Output != nil {
