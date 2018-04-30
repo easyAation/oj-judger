@@ -39,7 +39,7 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	log.Info(submitId, "start judge")
+	log.Infof("%s start judge default", submitId)
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
@@ -55,7 +55,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Info(submitId, "create workdir")
+	log.Infof("%s create workdir", submitId)
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
@@ -64,7 +64,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Info(submitId, "get project")
+	log.Infof("%s get project", submitId)
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
@@ -80,7 +80,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Println(submitId, "get code")
+	log.Infof("%s get code", submitId)
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
@@ -89,7 +89,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Println(submitId, "get case")
+	log.Infof("%s get case", submitId)
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
@@ -99,11 +99,10 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
-	// 编译中
 	callResult(submit, judge.Result{
 		ResultCode: judge.Compiling,
 	})
-	log.Info(submitId, "start compile")
+	log.Infof("%s start compile", submitId)
 	j := judge.NewJudge(submit.Language)
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
@@ -111,7 +110,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		callResult(submit, result)
 		return result
 	}
-	log.Info(submitId, "start run")
+	log.Infof("%s start run", submitId)
 	// 运行中
 	callResult(submit, judge.Result{
 		ResultCode: judge.Running,
@@ -148,6 +147,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		diff := compare(workDir+"/"+name+".user", workDir+"/case/"+name+".out")
 		if diff != "" {
 			result.ResultCode = judge.WrongAnswer
+			result.ResultDes = diff
 			totalResult = result
 			break
 		}
@@ -163,7 +163,7 @@ func callResult(submit *models.Submit, result judge.Result) {
 	submit.RunningTime = result.RunningTime
 	submit.RunningMemory = result.RunningMemory
 
-	log.Info("call result: %#v\n", result)
+	log.Infof("%s call result %#v", result)
 	err := models.SubmitUpdate(submit)
 	if err != nil {
 		log.Error("call result failure:", err.Error())
