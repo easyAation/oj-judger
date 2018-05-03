@@ -90,8 +90,12 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 			break
 		}
 		//fmt.Println(vm, rss, runningTime, cpuTime)
-		timeUse = int(cpuTime)
-		memoryUse = int(rss * 3 / 2)
+		if timeUse < int(cpuTime) {
+			timeUse = int(cpuTime)
+		}
+		if memoryUse < int(rss*3/2) {
+			memoryUse = int(rss * 3 / 2)
+		}
 
 		if cpuTime > s.TimeLimit ||
 			runningTime > 5*s.TimeLimit {
