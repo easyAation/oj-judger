@@ -39,7 +39,7 @@ func JudgeSpecial(submitId int64) judge.Result {
 }
 
 func JudgeDefault(submitId int64) judge.Result {
-	log.Infof("%d start judge default", submitId)
+	log.Debugf("submit:%d start judge default", submitId)
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
@@ -55,7 +55,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Infof("%d create workdir", submitId)
+	log.Debugf("submit:%d create workdir", submitId)
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
@@ -64,7 +64,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Infof("%d get project", submitId)
+	log.Debugf("submit:%d get project", submitId)
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
@@ -80,7 +80,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Infof("%d get code", submitId)
+	log.Debugf("submit:%d get code", submitId)
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
@@ -89,7 +89,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultDes:  err.Error(),
 		}
 	}
-	log.Infof("%d get case", submitId)
+	log.Debugf("submit:%d get case", submitId)
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
@@ -102,7 +102,7 @@ func JudgeDefault(submitId int64) judge.Result {
 	callResult(submit, judge.Result{
 		ResultCode: judge.Compiling,
 	})
-	log.Infof("%d start compile", submitId)
+	log.Debugf("submit:%d start compile", submitId)
 	j := judge.NewJudge(submit.Language)
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {

@@ -42,7 +42,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		log.Println("A")
+		log.Debugf("cmd.StderrPipe: %s", err.Error())
 		return
 	}
 	if s.Output != nil {
@@ -53,8 +53,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		cmd.Stdin = s.Input
 	}
 	if err = cmd.Start(); err != nil {
-		log.Println(err)
-		fmt.Println("B")
+		log.Debugf("cmd.Start: %s", err.Error())
 		return
 	}
 	defer cmd.Process.Kill()
@@ -67,12 +66,12 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 		_, err := syscall.Wait4(cmd.Process.Pid, &wStatus, syscall.WUNTRACED, &rusage)
 		if err != nil {
-			log.Println("wait error", err)
-			errCh <- err
+			log.Debugf("syscall.Wait4: %s", err.Error())
+			errCh <- fmt.Errorf("syscall wait %s", err.Error())
 		}
 		if wStatus.Signaled() {
 			sig := wStatus.Signal()
-			log.Println("get signal", sig)
+			log.Debugf("wStatus.Signal: %s", err.Error())
 			errCh <- fmt.Errorf("get signal %s", sig)
 		}
 		errCh <- nil
@@ -82,7 +81,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 	for range ticker.C {
 		ok, vm, rss, runningTime, cpuTime := GetResourceUsage(cmd.Process.Pid)
 		if !ok {
-			log.Println("cmd 退出")
+			log.Debugf("cmd 退出")
 			break
 		}
 		//fmt.Println(vm, rss, runningTime, cpuTime)
@@ -92,20 +91,20 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		if cpuTime > s.TimeLimit ||
 			runningTime > 5*s.TimeLimit {
 			err = OutOfTimeError
-			log.Println("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
+			log.Debug("cpu limit: ", runningTime, cpuTime, s.TimeLimit)
 			return
 		}
 
 		if rss*3 > s.MemoryLimit*2 ||
 			vm > s.MemoryLimit*10 {
 			err = OutOfMemoryError
-			log.Println("rss limit: ", vm, rss, s.MemoryLimit)
+			log.Debug("rss limit: ", vm, rss, s.MemoryLimit)
 			return
 		}
 	}
 
 	if err != nil {
-		log.Println("A", err.Error())
+		log.Debug("A", err.Error())
 	}
 
 	err = <-errCh
