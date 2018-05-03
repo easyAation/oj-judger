@@ -57,14 +57,15 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		return
 	}
 	defer cmd.Process.Kill()
-
 	errCh := make(chan error)
+	isEnd := false
 
 	go func() {
 		var rusage syscall.Rusage
 		var wStatus syscall.WaitStatus
 
 		_, err := syscall.Wait4(cmd.Process.Pid, &wStatus, syscall.WUNTRACED, &rusage)
+		isEnd = true
 		if err != nil {
 			log.Debugf("syscall.Wait4: %s", err.Error())
 			errCh <- fmt.Errorf("syscall wait %s", err.Error())
@@ -79,7 +80,11 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 
 	ticker := time.NewTicker(time.Millisecond)
 	for range ticker.C {
+		if isEnd {
+			break
+		}
 		ok, vm, rss, runningTime, cpuTime := GetResourceUsage(cmd.Process.Pid)
+
 		if !ok {
 			log.Debugf("cmd 退出")
 			break
