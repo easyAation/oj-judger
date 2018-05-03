@@ -12,13 +12,21 @@ type JudgeGo struct {
 
 func (this *JudgeGo) Compile(workDir string, codeFile string) Result {
 	sd := sandbox.NewSandbox("go",
-		[]string{"build", workDir + "/" + codeFile, "-o", workDir + "/user.bin"},
+		[]string{"build", workDir + "/" + codeFile},
 		nil, nil,
 		5000, 100000)
 	_, _, err := sd.Run()
 	if err != nil {
 		return Result{
 			ResultCode: CompilationError,
+			ResultDes:  err.Error(),
+		}
+	}
+
+	err = os.Rename(string([]byte(codeFile)[:len(codeFile)-3]), workDir+"/user.bin")
+	if err != nil {
+		return Result{
+			ResultCode: SystemError,
 			ResultDes:  err.Error(),
 		}
 	}
