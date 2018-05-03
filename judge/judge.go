@@ -23,6 +23,8 @@ func NewJudge(language string) Judge {
 	case "python":
 		return &JudgePy{}
 	default:
-		panic("No such judge: " + language)
+		log.Panic("No such judge: " + language)
 	}
+
+	return nil
 }
