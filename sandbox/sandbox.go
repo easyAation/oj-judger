@@ -72,7 +72,7 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 		}
 		if wStatus.Signaled() {
 			sig := wStatus.Signal()
-			log.Debugf("wStatus.Signal: %s", err.Error())
+			log.Debugf("wStatus.Signal %s", sig)
 			errCh <- fmt.Errorf("get signal %s", sig)
 		}
 		errCh <- nil
