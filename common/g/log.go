@@ -28,7 +28,8 @@ func InitLog() {
 		log.Fatalf("create directory %s failure\n", conf.Log.Path)
 	}
 
-	log.SetLevel(log.InfoLevel)
+	//log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 
 	logPath := conf.Log.Path
