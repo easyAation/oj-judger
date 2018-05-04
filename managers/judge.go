@@ -43,7 +43,6 @@ func JudgeDefault(submitId int64) judge.Result {
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
-		callResult()
 		return judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
