@@ -229,7 +229,7 @@ func compare(userOutput string, caseOutput string) string {
 	// -N 将不存在的文件作为空白量比较
 	// -B 忽略空行
 	// --speed-large-files 假设是大文件、很多分散的小变化
-	cmd := exec.Command("diff", "-NB", "--speed-large-files", userOutput, caseOutput)
+	cmd := exec.Command("diff", "-NB", userOutput, caseOutput)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
