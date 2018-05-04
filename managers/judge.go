@@ -43,6 +43,7 @@ func JudgeDefault(submitId int64) judge.Result {
 	submit, err := models.SubmitGetById(submitId)
 	if err != nil {
 		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
+		callResult()
 		return judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
@@ -68,35 +69,43 @@ func JudgeDefault(submitId int64) judge.Result {
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
-		return judge.Result{
+		res := judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
+		callResult(submit, res)
+		return res
 	}
 	if problem == nil {
 		err = fmt.Errorf("get problem %d failure: col not found", submit.ProblemId)
-		return judge.Result{
+		res := judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
+		callResult(submit, res)
+		return res
 	}
 	log.Debugf("submit:%d get code", submitId)
 	err = getCode(submit.Code, workDir)
 	if err != nil {
 		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
-		return judge.Result{
+		res := judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
+		callResult(submit, res)
+		return res
 	}
 	log.Debugf("submit:%d get case", submitId)
 	err = getCase(problem.CaseData, workDir)
 	if err != nil {
 		err = fmt.Errorf("get case file %s failure: %s", problem.CaseData, err.Error())
-		return judge.Result{
+		res := judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
+		callResult(submit, res)
+		return res
 	}
 
 	callResult(submit, judge.Result{
