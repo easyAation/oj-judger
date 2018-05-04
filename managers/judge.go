@@ -172,7 +172,11 @@ func callResult(submit *models.Submit, result judge.Result) {
 	submit.RunningTime = result.RunningTime
 	submit.RunningMemory = result.RunningMemory
 
-	submit.ResultDes = string([]byte(submit.ResultDes)[:999])
+	length := len(submit.ResultDes)
+	if length > 999 {
+		length = 999
+	}
+	submit.ResultDes = string([]byte(submit.ResultDes)[:length])
 
 	log.Infof("%d call result %#v", submit.Id, result)
 	err := models.SubmitUpdate(submit)
