@@ -104,8 +104,9 @@ func (s *Sandbox) Run() (timeUse int, memoryUse int, err error) {
 			return
 		}
 
-		if rss*3 > s.MemoryLimit*2 ||
-			vm > s.MemoryLimit*10 {
+		//if rss*3 > s.MemoryLimit ||
+		//	vm > s.MemoryLimit*10 {
+		if rss > s.MemoryLimit {
 			err = OutOfMemoryError
 			log.Debug("rss limit: ", vm, rss, s.MemoryLimit)
 			return
