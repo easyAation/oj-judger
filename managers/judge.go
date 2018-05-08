@@ -231,7 +231,7 @@ func callResult(submit *models.Submit, result judge.Result) {
 			log.Error("problemCount set failure:", err.Error())
 			return
 		}
-		flag := redis.ProblemCountSet(submit.UserId, string(data))
+		flag := redis.ProblemCountSet(submit.ProblemId, string(data))
 		if !flag {
 			log.Error("problemCount set failure")
 		}
