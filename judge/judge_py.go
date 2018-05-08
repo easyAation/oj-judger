@@ -12,7 +12,15 @@ type JudgePy struct {
 
 func (this *JudgePy) Compile(workDir string, codeFile string) Result {
 	// 编译成功
-	// 将code名改为bin名，后缀可在run里添加.py即可
+	err := os.Rename(workDir+"/"+codeFile, workDir+"/user.bin")
+	if err != nil {
+		return Result{
+			ResultCode: SystemError,
+			ResultDes:  err.Error(),
+		}
+	}
+
+	// 编译成功
 	return Result{
 		ResultCode: Normal,
 		ResultDes:  "",
@@ -38,7 +46,7 @@ func (this *JudgePy) Run(bin string, inputFile string, outputFile string, timeLi
 	defer output.Close()
 
 	sd := sandbox.NewSandbox("python",
-		[]string{""},
+		[]string{bin},
 		bufio.NewReader(input), bufio.NewWriter(output), timeLimit, memoryLimit)
 	timeUse, memoryUse, err := sd.Run()
 

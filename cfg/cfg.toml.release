@@ -23,7 +23,7 @@ encodeMethod = "HS256" # [HS256, HS384, HS512]
 maxEffectiveTime = 3  # 最大存活时间:天
 
 [redis]
-address = "127.0.0.1:6379"      # redis address
+address = "10.0.1.214:6379"      # redis address
 password = ""                   # no password set
 database = 0                    # use default DB
 poolSize = 5
