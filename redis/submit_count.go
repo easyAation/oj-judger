@@ -5,7 +5,7 @@ import (
 
 	"fmt"
 
-	. "github.com/open-fightcoder/oj-web/common/store"
+	. "github.com/open-fightcoder/oj-judger/common/store"
 )
 
 func SubmitCountGet(userId int64) (string, error) {

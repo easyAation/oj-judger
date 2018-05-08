@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/go-redis/redis"
-	. "github.com/open-fightcoder/oj-web/common/store"
+	. "github.com/open-fightcoder/oj-judger/common/store"
 )
 
 func GroupRankAdd(groupId int64) error {

@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/go-redis/redis"
-	. "github.com/open-fightcoder/oj-web/common/store"
+	. "github.com/open-fightcoder/oj-judger/common/store"
 )
 
 func PersonWeekRankAdd(userId int64) error {

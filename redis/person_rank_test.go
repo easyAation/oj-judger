@@ -5,8 +5,8 @@ import (
 
 	"fmt"
 
-	"github.com/open-fightcoder/oj-web/common/g"
-	"github.com/open-fightcoder/oj-web/common/store"
+	"github.com/open-fightcoder/oj-judger/common/g"
+	"github.com/open-fightcoder/oj-judger/common/store"
 )
 
 func TestRankGet(t *testing.T) {
