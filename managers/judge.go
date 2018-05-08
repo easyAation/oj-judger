@@ -211,9 +211,9 @@ func callResult(submit *models.Submit, result judge.Result) {
 	}
 
 	if submit.Result > judge.Running {
-		jsonStr, err := redis.ProblemNumGet()
+		jsonStr, err := redis.ProblemCountGet(submit.ProblemId)
 		if err != nil {
-			log.Error("problemNum get failure:", err.Error())
+			log.Error("problemCount get failure:", err.Error())
 			return
 		}
 		var problemCount ProblemCount
