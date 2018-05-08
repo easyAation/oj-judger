@@ -24,7 +24,95 @@ func JudgeTest(submitId int64) judge.Result {
 	// 编译
 	// 运行
 	// 写入结果
-	return judge.Result{}
+	log.Debugf("submit:%d start judge test", submitId)
+	submit, err := models.SubmitTestGetById(submitId)
+	if err != nil {
+		err = fmt.Errorf("get submit %d failure: %s", submitId, err.Error())
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+	}
+	if submit == nil {
+		err = fmt.Errorf("get submit %d failure: col not found", submitId)
+		return judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+	}
+	log.Debugf("submit:%d create workdir", submitId)
+	workDir, err := createWorkDir("test", submitId, submit.UserId)
+	if err != nil {
+		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
+		res := judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+		callTestResult(submit, res)
+		return res
+	}
+	log.Debugf("submit:%d get code", submitId)
+	err = getCode(submit.Code, workDir)
+	if err != nil {
+		err = fmt.Errorf("get code file %s failure: %s", submit.Code, err.Error())
+		res := judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+		callTestResult(submit, res)
+		return res
+	}
+	err = ioutil.WriteFile(workDir+"/input", []byte(submit.Input), 0644)
+	if err != nil {
+		err = fmt.Errorf("get input %s failure: %s", submit.Input, err.Error())
+		res := judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+		callTestResult(submit, res)
+		return res
+	}
+	callTestResult(submit, judge.Result{
+		ResultCode: judge.Compiling,
+	})
+	log.Debugf("submit:%d start compile", submitId)
+	j := judge.NewJudge(submit.Language)
+	result := j.Compile(workDir, submit.Code)
+	if result.ResultCode != 0 {
+		// 编译失败
+		callTestResult(submit, result)
+		return result
+	}
+	log.Infof("%d start run", submitId)
+	// 运行中
+	callTestResult(submit, judge.Result{
+		ResultCode: judge.Running,
+	})
+	result = j.Run(workDir+"/user.bin",
+		workDir+"/input",
+		workDir+"/output",
+		int64(5000),
+		int64(100000))
+	log.Infof("%d run result %#v", submitId, result)
+	if result.ResultCode != judge.Normal {
+		callTestResult(submit, result)
+		return result
+	}
+	data, err := ioutil.ReadFile(workDir + "/output")
+	if err != nil {
+		err = fmt.Errorf("get output failure: %s", err.Error())
+		res := judge.Result{
+			ResultCode: judge.SystemError,
+			ResultDes:  err.Error(),
+		}
+		callTestResult(submit, res)
+		return res
+	}
+	result.ResultCode = judge.Accepted
+	result.ResultDes = string(data)
+
+	callTestResult(submit, result)
+	return result
 }
 
 func JudgeSpecial(submitId int64) judge.Result {
@@ -62,12 +150,14 @@ func JudgeDefault(submitId int64) judge.Result {
 	workDir, err := createWorkDir("default", submitId, submit.UserId)
 	if err != nil {
 		err = fmt.Errorf("create workDir %s failure: %s", workDir, err.Error())
-		return judge.Result{
+		res := judge.Result{
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
+		callDefaResult(submit, res)
+		return res
 	}
-	log.Debugf("submit:%d get project", submitId)
+	log.Debugf("submit:%d get problem", submitId)
 	problem, err := models.ProblemGetById(submit.ProblemId)
 	if err != nil {
 		err = fmt.Errorf("get problem failure: %s", err.Error())
@@ -75,7 +165,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
-		callResult(submit, res)
+		callDefaResult(submit, res)
 		return res
 	}
 	if problem == nil {
@@ -84,7 +174,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
-		callResult(submit, res)
+		callDefaResult(submit, res)
 		return res
 	}
 	log.Debugf("submit:%d get code", submitId)
@@ -95,7 +185,7 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
-		callResult(submit, res)
+		callDefaResult(submit, res)
 		return res
 	}
 	log.Debugf("submit:%d get case", submitId)
@@ -106,11 +196,11 @@ func JudgeDefault(submitId int64) judge.Result {
 			ResultCode: judge.SystemError,
 			ResultDes:  err.Error(),
 		}
-		callResult(submit, res)
+		callDefaResult(submit, res)
 		return res
 	}
 
-	callResult(submit, judge.Result{
+	callDefaResult(submit, judge.Result{
 		ResultCode: judge.Compiling,
 	})
 	log.Debugf("submit:%d start compile", submitId)
@@ -118,12 +208,12 @@ func JudgeDefault(submitId int64) judge.Result {
 	result := j.Compile(workDir, submit.Code)
 	if result.ResultCode != 0 {
 		// 编译失败
-		callResult(submit, result)
+		callDefaResult(submit, result)
 		return result
 	}
 	log.Infof("%d start run", submitId)
 	// 运行中
-	callResult(submit, judge.Result{
+	callDefaResult(submit, judge.Result{
 		ResultCode: judge.Running,
 	})
 
@@ -165,7 +255,7 @@ func JudgeDefault(submitId int64) judge.Result {
 		}
 	}
 
-	callResult(submit, totalResult)
+	callDefaResult(submit, totalResult)
 	return totalResult
 }
 
@@ -186,7 +276,7 @@ type ProblemCount struct {
 	TotalNum int64 `json:"total_num"`
 }
 
-func callResult(submit *models.Submit, result judge.Result) {
+func callTestResult(submit *models.SubmitTest, result judge.Result) {
 	submit.Result = result.ResultCode
 	submit.ResultDes = result.ResultDes
 	submit.RunningTime = result.RunningTime
@@ -198,10 +288,30 @@ func callResult(submit *models.Submit, result judge.Result) {
 	}
 	submit.ResultDes = string([]byte(submit.ResultDes)[:length])
 
-	log.Infof("%d call result %#v", submit.Id, result)
+	log.Infof("%d call test result %#v", submit.Id, result)
+	err := models.SubmitTestUpdate(submit)
+	if err != nil {
+		log.Error("call test result failure:", err.Error())
+	}
+	return
+}
+
+func callDefaResult(submit *models.Submit, result judge.Result) {
+	submit.Result = result.ResultCode
+	submit.ResultDes = result.ResultDes
+	submit.RunningTime = result.RunningTime
+	submit.RunningMemory = result.RunningMemory
+
+	length := len(submit.ResultDes)
+	if length > 999 {
+		length = 999
+	}
+	submit.ResultDes = string([]byte(submit.ResultDes)[:length])
+
+	log.Infof("%d call defalut result %#v", submit.Id, result)
 	err := models.SubmitUpdate(submit)
 	if err != nil {
-		log.Error("call result failure:", err.Error())
+		log.Error("call defalut result failure:", err.Error())
 	}
 	if submit.Result == judge.Accepted {
 		redis.PersonWeekRankUpdate(1, submit.UserId)
