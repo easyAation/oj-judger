@@ -15,5 +15,5 @@ func Init(cfgFile string) {
 
 func Close() {
 	store.CloseMysql()
-	//store.CloseRedis()
+	store.CloseRedis()
 }
