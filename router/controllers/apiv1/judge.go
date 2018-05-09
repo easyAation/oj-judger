@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/open-fightcoder/oj-judger/managers"
 	"github.com/open-fightcoder/oj-judger/router/controllers/base"
+	"github.com/sirupsen/logrus"
 )
 
 func RegisterJudge(router *gin.RouterGroup) {
@@ -25,6 +26,7 @@ func httpHandlerJudgeTest(c *gin.Context) {
 		panic(err)
 	}
 	result := managers.JudgeTest(job.SubmitId)
+	logrus.Debugf("judge test result %#v", result)
 	c.JSON(http.StatusOK, base.Success(result))
 }
 
@@ -45,5 +47,6 @@ func httpHandlerJudgeDefault(c *gin.Context) {
 		panic(err)
 	}
 	result := managers.JudgeDefault(job.SubmitId)
+	logrus.Debugf("judge defa result %#v", result)
 	c.JSON(http.StatusOK, base.Success(result))
 }

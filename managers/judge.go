@@ -7,12 +7,15 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"encoding/json"
+
 	"github.com/mholt/archiver"
 	"github.com/minio/minio-go"
 	"github.com/open-fightcoder/oj-judger/common/g"
 	"github.com/open-fightcoder/oj-judger/common/store"
 	"github.com/open-fightcoder/oj-judger/judge"
 	"github.com/open-fightcoder/oj-judger/models"
+	"github.com/open-fightcoder/oj-judger/redis"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -310,79 +313,79 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 	if err != nil {
 		log.Error("call defalut result failure:", err.Error())
 	}
-	//if submit.Result == judge.Accepted {
-	//	redis.PersonWeekRankUpdate(1, submit.UserId)
-	//	redis.PersonMonthRankUpdate(1, submit.UserId)
-	//	redis.RankListUpdate(1, submit.UserId)
-	//
-	//}
-	//
-	//if submit.Result > judge.Running {
-	//	jsonStr, err := redis.ProblemCountGet(submit.ProblemId)
-	//	if err != nil {
-	//		log.Error("problemCount get failure:", err.Error())
-	//		return
-	//	}
-	//	var problemCount ProblemCount
-	//	err = json.Unmarshal([]byte(jsonStr), &problemCount)
-	//	if err != nil {
-	//		log.Error("problemCount get failure:", err.Error())
-	//		return
-	//	}
-	//	problemCount.TotalNum += 1
-	//	if submit.Result == judge.Accepted {
-	//		problemCount.AcNum += 1
-	//	}
-	//	data, err := json.Marshal(problemCount)
-	//	if err != nil {
-	//		log.Error("problemCount set failure:", err.Error())
-	//		return
-	//	}
-	//	flag := redis.ProblemCountSet(submit.ProblemId, string(data))
-	//	if !flag {
-	//		log.Error("problemCount set failure")
-	//	}
-	//
-	//	jsonStr, err = redis.SubmitCountGet(submit.UserId)
-	//	if err != nil {
-	//		log.Error("submitcount get failure:", err.Error())
-	//		return
-	//	}
-	//	var submitCount SubmitCount
-	//	err = json.Unmarshal([]byte(jsonStr), &submitCount)
-	//	if err != nil {
-	//		log.Error("submitcount get failure:", err.Error())
-	//		return
-	//	}
-	//	switch submit.Result {
-	//	case judge.Accepted:
-	//		submitCount.Accepted += 1
-	//	case judge.WrongAnswer:
-	//		submitCount.WrongAnswer += 1
-	//	case judge.CompilationError:
-	//		submitCount.CompilationError += 1
-	//	case judge.TimeLimitExceeded:
-	//		submitCount.TimeLimitExceeded += 1
-	//	case judge.MemoryLimitExceeded:
-	//		submitCount.MemoryLimitExceeded += 1
-	//	case judge.OutputLimitExceeded:
-	//		submitCount.OutputLimitExceeded += 1
-	//	case judge.RuntimeError:
-	//		submitCount.RuntimeError += 1
-	//	case judge.SystemError:
-	//		submitCount.SystemError += 1
-	//	}
-	//
-	//	data, err = json.Marshal(submitCount)
-	//	if err != nil {
-	//		log.Error("submitcount set failure:", err.Error())
-	//		return
-	//	}
-	//	flag = redis.SubmitCountSet(submit.UserId, string(data))
-	//	if !flag {
-	//		log.Error("submitcount set failure")
-	//	}
-	//}
+	if submit.Result == judge.Accepted {
+		redis.PersonWeekRankUpdate(1, submit.UserId)
+		redis.PersonMonthRankUpdate(1, submit.UserId)
+		redis.RankListUpdate(1, submit.UserId)
+
+	}
+
+	if submit.Result > judge.Running {
+		jsonStr, err := redis.ProblemCountGet(submit.ProblemId)
+		if err != nil {
+			log.Error("problemCount get failure:", err.Error())
+			return
+		}
+		var problemCount ProblemCount
+		err = json.Unmarshal([]byte(jsonStr), &problemCount)
+		if err != nil {
+			log.Error("problemCount get failure:", err.Error())
+			return
+		}
+		problemCount.TotalNum += 1
+		if submit.Result == judge.Accepted {
+			problemCount.AcNum += 1
+		}
+		data, err := json.Marshal(problemCount)
+		if err != nil {
+			log.Error("problemCount set failure:", err.Error())
+			return
+		}
+		flag := redis.ProblemCountSet(submit.ProblemId, string(data))
+		if !flag {
+			log.Error("problemCount set failure")
+		}
+
+		jsonStr, err = redis.SubmitCountGet(submit.UserId)
+		if err != nil {
+			log.Error("submitcount get failure:", err.Error())
+			return
+		}
+		var submitCount SubmitCount
+		err = json.Unmarshal([]byte(jsonStr), &submitCount)
+		if err != nil {
+			log.Error("submitcount get failure:", err.Error())
+			return
+		}
+		switch submit.Result {
+		case judge.Accepted:
+			submitCount.Accepted += 1
+		case judge.WrongAnswer:
+			submitCount.WrongAnswer += 1
+		case judge.CompilationError:
+			submitCount.CompilationError += 1
+		case judge.TimeLimitExceeded:
+			submitCount.TimeLimitExceeded += 1
+		case judge.MemoryLimitExceeded:
+			submitCount.MemoryLimitExceeded += 1
+		case judge.OutputLimitExceeded:
+			submitCount.OutputLimitExceeded += 1
+		case judge.RuntimeError:
+			submitCount.RuntimeError += 1
+		case judge.SystemError:
+			submitCount.SystemError += 1
+		}
+
+		data, err = json.Marshal(submitCount)
+		if err != nil {
+			log.Error("submitcount set failure:", err.Error())
+			return
+		}
+		flag = redis.SubmitCountSet(submit.UserId, string(data))
+		if !flag {
+			log.Error("submitcount set failure")
+		}
+	}
 
 	return
 }
