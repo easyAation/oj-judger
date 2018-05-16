@@ -328,13 +328,13 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 			redis.PersonWeekRankUpdate(1, submit.UserId)
 			redis.PersonMonthRankUpdate(1, submit.UserId)
 			redis.RankListUpdate(1, submit.UserId)
-			log.Debug("set 1")
-			redis.ProblemStatusSet(submit.UserId, submit.ProblemId, 1)
 		}
+		log.Debug("set 1")
+		redis.ProblemStatusSet(submit.UserId, submit.ProblemId, 1)
 	}
 
 	if submit.Result > judge.Running {
-		if submit.Result != judge.Accepted {
+		if submit.Result != judge.Accepted && !isAc(submit) {
 			log.Debug("set 2")
 			redis.ProblemStatusSet(submit.UserId, submit.ProblemId, 2)
 		}
