@@ -325,6 +325,7 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 	}
 	if submit.Result == judge.Accepted {
 		if !isAc(submit) {
+			log.Debug("更新排行榜")
 			redis.PersonWeekRankUpdate(1, submit.UserId)
 			redis.PersonMonthRankUpdate(1, submit.UserId)
 			redis.RankListUpdate(1, submit.UserId)
