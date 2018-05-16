@@ -15,7 +15,7 @@ func GroupRankAdd(groupId int64) error {
 	return nil
 }
 
-func GroupRankIncr(increment int, groupId int64) error {
+func GroupRankUpdate(increment int, groupId int64) error {
 	res := RedisClient.ZIncrBy("group_rank", float64(increment), strconv.FormatInt(groupId, 10))
 	if res.Err() != nil {
 		return res.Err()

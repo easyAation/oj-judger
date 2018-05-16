@@ -9,19 +9,18 @@ import (
 	"github.com/open-fightcoder/oj-judger/common/store"
 )
 
-func TestProblemCountSet(t *testing.T) {
+func TestProblemStatusSet(t *testing.T) {
 	g.LoadConfig("../cfg/cfg.toml.debug")
 	store.InitRedis()
 
-	for i := 1; i <= 2300; i++ {
-		ProblemCountSet(int64(i), "{\"ac_num\":0,\"total_num\":0}")
-	}
+	//for i := 1; i <= 2300; i++ {
+	fmt.Println(ProblemStatusSet(10, 7, 1))
+	//}
 }
 
-func TestProblemCountGet(t *testing.T) {
+func TestProblemStatusGet(t *testing.T) {
 	g.LoadConfig("../cfg/cfg.toml.debug")
 	store.InitRedis()
 
-	aa, err := ProblemCountGet(1)
-	fmt.Println(aa, err)
+	fmt.Println(ProblemStatusGet(1, 3))
 }

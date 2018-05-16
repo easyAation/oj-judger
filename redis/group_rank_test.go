@@ -23,10 +23,10 @@ func TestGroupRankUpdate(t *testing.T) {
 	g.LoadConfig("../cfg/cfg.toml.debug")
 	store.InitRedis()
 
-	err := GroupRankIncr(1, 1)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	//err := GroupRankIncr(1, 1)
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//}
 }
 
 func TestGroupRankGet(t *testing.T) {

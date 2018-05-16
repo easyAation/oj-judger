@@ -18,7 +18,7 @@ func ProblemNumGet() (string, error) {
 	return res.Val(), nil
 }
 
-func ProblemNumIncr() error {
+func ProblemNumUpdate() error {
 	res := RedisClient.Incr("problem_num")
 	if res.Err() != nil {
 		return res.Err()
