@@ -324,6 +324,8 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 		log.Error("call defalut result failure:", err.Error())
 	}
 	if submit.Result == judge.Accepted {
+		log.Debug("AC")
+		log.Debug(isAc(submit))
 		if !isAc(submit) {
 			log.Debug("更新排行榜")
 			err := redis.PersonWeekRankUpdate(1, submit.UserId)
