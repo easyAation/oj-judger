@@ -9,7 +9,7 @@ func Init(cfgFile string) {
 	g.LoadConfig(cfgFile)
 	g.InitLog()
 	store.InitMysql()
-	//store.InitRedis()
+	store.InitRedis()
 	store.InitMinio()
 }
 
