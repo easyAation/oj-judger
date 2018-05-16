@@ -333,7 +333,9 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 	}
 
 	if submit.Result > judge.Running {
-		redis.ProblemStatusSet(submit.UserId, submit.ProblemId, 2)
+		if submit.Result != judge.Accepted {
+			redis.ProblemStatusSet(submit.UserId, submit.ProblemId, 2)
+		}
 
 		jsonStr, err := redis.ProblemCountGet(submit.ProblemId)
 		if err != nil {
