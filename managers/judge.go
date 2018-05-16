@@ -318,11 +318,6 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 	}
 	submit.ResultDes = string([]byte(submit.ResultDes)[:length])
 
-	log.Infof("%d call defalut result %#v", submit.Id, result)
-	err := models.SubmitUpdate(submit)
-	if err != nil {
-		log.Error("call defalut result failure:", err.Error())
-	}
 	if submit.Result == judge.Accepted {
 		log.Debug("AC")
 		log.Debug(isAc(submit))
@@ -415,6 +410,12 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 		if !flag {
 			log.Error("submitcount set failure")
 		}
+	}
+
+	log.Infof("%d call defalut result %#v", submit.Id, result)
+	err := models.SubmitUpdate(submit)
+	if err != nil {
+		log.Error("call defalut result failure:", err.Error())
 	}
 
 	return
