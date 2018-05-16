@@ -296,6 +296,16 @@ func callTestResult(submit *models.SubmitTest, result judge.Result) {
 	return
 }
 
+func isAc(submit *models.Submit) bool {
+	submitList, _ := models.SubmitGetByUserId(submit.UserId)
+	for _, sub := range submitList {
+		if sub.Result == judge.Accepted {
+			return true
+		}
+	}
+	return false
+}
+
 func callDefaResult(submit *models.Submit, result judge.Result) {
 	submit.Result = result.ResultCode
 	submit.ResultDes = result.ResultDes
@@ -314,10 +324,11 @@ func callDefaResult(submit *models.Submit, result judge.Result) {
 		log.Error("call defalut result failure:", err.Error())
 	}
 	if submit.Result == judge.Accepted {
-		redis.PersonWeekRankUpdate(1, submit.UserId)
-		redis.PersonMonthRankUpdate(1, submit.UserId)
-		redis.RankListUpdate(1, submit.UserId)
-
+		if !isAc(submit) {
+			redis.PersonWeekRankUpdate(1, submit.UserId)
+			redis.PersonMonthRankUpdate(1, submit.UserId)
+			redis.RankListUpdate(1, submit.UserId)
+		}
 	}
 
 	if submit.Result > judge.Running {
