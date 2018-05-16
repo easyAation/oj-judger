@@ -45,9 +45,9 @@ func SubmitGetById(id int64) (*Submit, error) {
 	return submit, nil
 }
 
-func SubmitGetByUserId(userId int64, currentPage int, perPage int) ([]*Submit, error) {
+func SubmitGetByUserId(userId int64) ([]*Submit, error) {
 	submitList := make([]*Submit, 0)
-	err := OrmWeb.Where("user_id=?", userId).Limit(perPage, (currentPage-1)*perPage).Find(&submitList)
+	err := OrmWeb.Where("user_id=?", userId).Find(&submitList)
 	if err != nil {
 		return nil, err
 	}
