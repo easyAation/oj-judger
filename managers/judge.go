@@ -299,7 +299,7 @@ func callTestResult(submit *models.SubmitTest, result judge.Result) {
 func isAc(submit *models.Submit) bool {
 	submitList, _ := models.SubmitGetByUserId(submit.UserId)
 	for _, sub := range submitList {
-		if sub.Result == judge.Accepted {
+		if sub.ProblemId == submit.ProblemId && sub.Result == judge.Accepted {
 			return true
 		}
 	}
